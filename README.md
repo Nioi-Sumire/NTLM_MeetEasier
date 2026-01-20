@@ -4,7 +4,7 @@ Because why pay money for something you can do yourself?
 
 ## Description
 
-MeetEasier is a web application that visualizes meeting room availability.  It works using Exchange Web Services (EWS) with Exchange room lists in Office 365.
+MeetEasier is a web application that visualizes meeting room availability. It works using Exchange Web Services (EWS) with Exchange room lists.
 
 ![Mockup 1](mockups/mockup-1.jpg)
 
@@ -20,33 +20,11 @@ In the event of wanting to commercially distribute a closed source modification 
 
 ## Updates
 
-* v0.3.4
-  * [#34](https://github.com/danxfisher/MeetEasier/pull/34) - bug fix for 'Next up:' displaying incorrectly
-* v0.3.3
-  * [#18](https://github.com/danxfisher/MeetEasier/pull/15) - use localized sort for rooms
-* v0.3.2
-  * Added additional error handling for incorrect credentials.  The error will now be shown on the front end.
-  * Updated the socket component to stop most ERR_CONNECTION_REFSUED errors from happening.
-* v0.3.1
-  * Removed skipped rooms/room blacklist filtering from front end and added to back end.
-* v0.3
-  * Cleaned up unnecessarily nested component folder structure
-  * [#8](https://github.com/danxfisher/MeetEasier/pull/8) - add script-shortcuts to `package.json` in root
-  * [#9](https://github.com/danxfisher/MeetEasier/pull/9) - support environment-variables for authentication and port configuration
-  * [#10](https://github.com/danxfisher/MeetEasier/pull/10) - create shrinkwraps for npm-dependencies
-  * [#11](https://github.com/danxfisher/MeetEasier/pull/11) - add `.editorconfig`
-  * [#12](https://github.com/danxfisher/MeetEasier/pull/12) - pass error (while fetching appointments), to frontend
-  * [#13](https://github.com/danxfisher/MeetEasier/pull/13) - set engine-requirements
-  * [#14](https://github.com/danxfisher/MeetEasier/pull/14) - add heartbeat-endpoint, to check if server is alive (for monitoring)
-  * [#15](https://github.com/danxfisher/MeetEasier/pull/15) - add '.nvmrc'
-* v0.2
-  * Changed domain to accept more than just ".com" extension
-  * Changed `ui-react/config/flightboard.config.js` to handle all text so that the application can be multilingual
-  * Added `ui-react/config/singleRoom.config.js` to do the same for the `single-room` component
-  * Added `console.log` to `server.js` to know when the server is running correctly
-  * Updated styles slightly
-* v0.1
-  * Initial release
+This fork includes the following changes compared to the original project:
+
+* Switched EWS authentication from Basic Auth to NTLM (`httpntlm`).
+* Auth configuration now uses `EXCHANGE_*` environment variables (optionally via `.env`).
+* Added optional LED status output, mirrored to a JSON file for external hardware.
 
 ***
 
@@ -54,7 +32,7 @@ In the event of wanting to commercially distribute a closed source modification 
 
 This application assumes you have:
 
-* Exchange Online (Office 365)
+* Exchange (Online or on-prem) with EWS and room lists enabled
 * Conference room mailboxes organized in room lists
 * Exchange Web Services (EWS) enabled
 * A service account with access to all conference room mailboxes and EWS
@@ -91,7 +69,7 @@ This application assumes you have:
 
 * `app/` : Routes for EWS APIs
 * `app/ews/` : All EWS functionality
-* `confg/` : All server side configuration settings
+* `config/` : All server side configuration settings
 * `scss/` : All styles
 * `static/` : All global static files
 * `ui-react/` : Front end React routes and components
@@ -171,14 +149,12 @@ There are three main directories in the `ui-react/src/` folder:
     export LED_STATE_FILE=/run/room-led/state.json
     ```
 
-* In `/config/room-blacklist.js`, add any room by email to exclude it from the list of rooms:
+* In `/config/room-blacklist.js`, add any room email to exclude it from the list of rooms:
 
     ```javascript
-      module.exports = {
-        'roomEmails' : [
-          'ROOM_EMAIL@DOMAIN.com'
-        ]
-      };
+      module.exports = [
+        'ROOM_EMAIL@DOMAIN.com'
+      ];
     ```
 
 * In `/ui-react/src/config/flightboard.config.js`, manage your customizations:
@@ -214,15 +190,6 @@ There are three main directories in the `ui-react/src/` folder:
 * Optional LED status output: the backend can mirror the current room status to a JSON file for external hardware (e.g., LEDs).
   * Configure `DISPLAY_ROOM_ALIAS` to match the room alias used by the app, and `LED_STATE_FILE` to control the output path (default: `/run/room-led/state.json`).
   * The file is only written when the status changes and contains `{ roomAlias, busy, error, ts }`. Writes are best-effort; errors are ignored.
-* In `app/ews/rooms.js`, there is a block of code that may not be necessary but were added as a convenience.  Feel free to use it, comment it out, or remove it completely.  It was designed for a use case where the email addresses (ex: jsmith@domain.com) do not match the corporate domain (ex: jsmith-enterprise).
-    ```javascript
-    // if the email domain != your corporate domain,
-    // replace email domain with domain from auth config
-    var email = roomItem.Address;
-    email = email.substring(0, email.indexOf('@'));
-    email = email + '@' + auth.domain + '.com';
-    ```
-
 ***
 
 ## Flightboard Layout Mockup
