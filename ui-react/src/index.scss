@@ -1,0 +1,19 @@
+/* =========================
+   Basis-Styles
+   ========================= */
+body {
+  margin: 0;
+  padding: 0;
+  /* font-family: sans-serif; */
+}
+
+svg {
+  width: 100px;
+  height: 100px;
+  margin: 20px;
+  display: inline-block;
+}
+
+@import './scss/variables';
+@import './scss/globals';
+

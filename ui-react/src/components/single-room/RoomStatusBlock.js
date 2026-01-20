@@ -19,9 +19,17 @@ const Details = ({room, details}) => (
 const Time = ({room, details}) => (
   <div id="single-room__meeting-time">
     { details.appointmentExists &&
-      new Date(parseInt(room.Appointments[0].Start, 10)).toLocaleTimeString([], {weekday: 'short', hour: '2-digit', minute: '2-digit'})
-      + ' - ' + 
-      new Date(parseInt(room.Appointments[0].End, 10)).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})
+      // Zeitformatierung: TT.MM. Wochentag HH:MM - HH:MM
+      (() => {
+        const start = new Date(parseInt(room.Appointments[0].Start, 10));
+        const end = new Date(parseInt(room.Appointments[0].End, 10));
+        const weekday = start.toLocaleDateString('en-US', { weekday: 'short' });
+        const day = String(start.getDate()).padStart(2, '0');
+        const month = String(start.getMonth() + 1).padStart(2, '0');
+        const startTime = start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const endTime = end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return `${day}.${month}. ${weekday} ${startTime} - ${endTime}`;
+      })()
     }
   </div>
 );
@@ -36,17 +44,26 @@ const Organizer = ({room, details}) => {
   );
 };
 
-const RoomStatusBlock = ({ config, details, room }) => (
-  <div className={room.Busy ? 'columns small-8 left-col busy' : 'columns small-8 left-col open'}>
-    <div id="single-room__room-name">{room.Name}</div>
-    <div id="single-room__room-status">{room.Busy ? config.statusBusy : config.statusAvailable}</div>
+const RoomStatusBlock = ({ config, details, room }) => {
+  // Prüfen ob ErrorMessage gesetzt ist
+  let statusText;
+  if (room.ErrorMessage) {
+    statusText = "Error! Please contact IT.";
+  } else {
+    statusText = room.Busy ? config.statusBusy : config.statusAvailable;
+  }
 
-    <Details room={room} details={details} />
-    <Time room={room} details={details} />
-    <Organizer room={room} details={details} />
+  return (
+    <div className={room.Busy ? 'columns small-8 left-col busy' : 'columns small-8 left-col open'}>
+      <div id="single-room__room-name">{room.Name}</div>
+      <div id="single-room__room-status">{statusText}</div>
 
-  </div>
-);
+      <Details room={room} details={details} />
+      <Time room={room} details={details} />
+      <Organizer room={room} details={details} />
+    </div>
+  );
+};
 
 RoomStatusBlock.propTypes = {
   room: PropTypes.object.isRequired,

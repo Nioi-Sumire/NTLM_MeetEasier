@@ -19,6 +19,7 @@
     "enzyme-adapter-react-16": "1.1.1",
     "enzyme-to-json": "3.3.4",
     "jest-extended": "^0.8.1",
+    "sass": "^1.89.2",
     "sinon": "6.1.4"
   },
   "scripts": {

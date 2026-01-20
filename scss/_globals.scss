@@ -313,11 +313,13 @@ body {
           }
 
           td.up__meeting-title {
-            font-size: 1.1vw;
+	    /* war 1.1vw --> Aenderungswunsch */	
+            font-size: 1.4vw;
           }
 
           td.up__meeting-time {
-            font-size: 0.9vw;
+            /* war 0.9vw --> Aenderungswunsch */
+            font-size: 1.4vw;
             color: $gray;
           }
         }
@@ -344,6 +346,14 @@ body {
       }
     }
   }
+}
+
+/* Änderungen für IAMO */
+#single-room__wrap .small-8.left-col {
+  width: 58% !important;
+}
+#single-room__wrap .small-4.right-col {
+  width: 42% !important;
 }
 
 @media screen and (min-width: 40em) {

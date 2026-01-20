@@ -14,6 +14,7 @@ MeetEasier is a web application that visualizes meeting room availability.  It w
 
 MeetEasier is licensed under the open source [GNU General Public License (GPL 3.0)](https://github.com/danxfisher/MeetEasier/blob/master/LICENSE).
 
+In the event of wanting to commercially distribute a closed source modification of this code, please contact [danxfisher](https://github.com/danxfisher).
 
 ***
 
@@ -59,7 +60,7 @@ This application assumes you have:
 * A service account with access to all conference room mailboxes and EWS
 * A web server with Node.js installed to run the application
 
-**Please Note:** This application uses Basic Authentication which, by its very nature, is insecure.  I would strongly suggest using SSL where ever you decide to run this.
+**Please Note:** This application uses NTLM authentication for EWS. Use HTTPS and restrict the service account to the minimum required permissions.
 
 ***
 
@@ -143,26 +144,31 @@ There are three main directories in the `ui-react/src/` folder:
 
 ### Simple
 
-* In `/config/auth.js`, enter your credentials and domain:
+* `/config/auth.js` reads credentials from environment variables (or a local `.env` file):
 
     ```javascript
     module.exports = {
       // this user MUST have full access to all the room accounts
-      'exchange' : {
-        'username'  : 'SVCACCT_EMAIL@DOMAIN.COM',
-        'password'  : 'PASSWORD',
-        'uri'       : 'https://outlook.office365.com/EWS/Exchange.asmx'
-      },
-      'domain' : 'DOMAIN'
+      exchange: {
+        username: process.env.EXCHANGE_USER,
+        password: process.env.EXCHANGE_PASS,
+        domain: process.env.EXCHANGE_DOMAIN,
+        uri: process.env.EXCHANGE_URL,
+        maildomain: process.env.EXCHANGE_MAIL_DOMAIN
+      }
     };
     ```
 
-* Alternatively, username, password and domain can be set as environment variable
+* Example environment variables:
 
     ```bash
-    export USERNAME=svcacct_email@domain.com
-    export PASSWORD=password
-    export DOMAIN=domain.com
+    export EXCHANGE_USER=svcacct_email@domain.com
+    export EXCHANGE_PASS=password
+    export EXCHANGE_DOMAIN=domain
+    export EXCHANGE_URL=https://outlook.office365.com/EWS/Exchange.asmx
+    export EXCHANGE_MAIL_DOMAIN=domain.com
+    export DISPLAY_ROOM_ALIAS=room-alias
+    export LED_STATE_FILE=/run/room-led/state.json
     ```
 
 * In `/config/room-blacklist.js`, add any room by email to exclude it from the list of rooms:
@@ -205,6 +211,9 @@ There are three main directories in the `ui-react/src/` folder:
 * To change the interval in which the web socket emits, edit the interval time in `app/socket-controller.js`.  By default, it is set to 1 minute.
 * To update styles, make sure you install grunt first with `npm install -g grunt-cli`.  Then run `grunt` in the root directory to watch for SCSS changes.  Use the `.scss` files located in the `/scss` folder.
   * All React components can be locally styled by adding a new `.css` file and importing it into the component itself if you'd prefer to do it that way.
+* Optional LED status output: the backend can mirror the current room status to a JSON file for external hardware (e.g., LEDs).
+  * Configure `DISPLAY_ROOM_ALIAS` to match the room alias used by the app, and `LED_STATE_FILE` to control the output path (default: `/run/room-led/state.json`).
+  * The file is only written when the status changes and contains `{ roomAlias, busy, error, ts }`. Writes are best-effort; errors are ignored.
 * In `app/ews/rooms.js`, there is a block of code that may not be necessary but were added as a convenience.  Feel free to use it, comment it out, or remove it completely.  It was designed for a use case where the email addresses (ex: jsmith@domain.com) do not match the corporate domain (ex: jsmith-enterprise).
     ```javascript
     // if the email domain != your corporate domain,

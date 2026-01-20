@@ -6,14 +6,19 @@ var app = express();
 
 // configuration ===============================================================
 // use public folder for js, css, imgs, etc
-app.use(express.static('static'));
 app.use(express.static(`${__dirname}/ui-react/build`));
+app.use(express.static('static'));
 
 // routes ======================================================================
 require('./app/routes.js')(app);
 
 // launch ======================================================================
 const port = process.env.PORT || 8080;
+
+// fallback: return index.html for all unmatched routes (React SPA)
+app.get('*', (req, res) => {
+  res.sendFile(`${__dirname}/ui-react/build/index.html`);
+});
 
 var theserver = app.listen(port, function(){
 	// call controller functions -------------------------------------------------
