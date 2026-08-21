@@ -1,0 +1,41 @@
+{
+  "name": "ui-react",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=24.0.0",
+    "npm": ">=11.0.0"
+  },
+  "dependencies": {
+    "prop-types": "15.6.2",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-router-dom": "7.18.2",
+    "socket.io-client": "4.8.3"
+  },
+  "devDependencies": {
+    "@fontsource/titillium-web": "5.3.0",
+    "@testing-library/react": "16.3.2",
+    "@testing-library/user-event": "14.6.5",
+    "@vitejs/plugin-react": "6.0.5",
+    "@vitest/coverage-v8": "4.1.10",
+    "foundation-sites": "6.2.3",
+    "jsdom": "29.1.1",
+    "vite": "8.2.1",
+    "vitest": "4.1.10"
+  },
+  "scripts": {
+    "prepare-assets": "node scripts/prepare-local-assets.js",
+    "prestart": "npm run prepare-assets",
+    "start": "vite",
+    "prebuild": "npm run prepare-assets",
+    "build": "vite build && npm run test:build-output",
+    "test:dev-server": "node scripts/check-development-server.mjs",
+    "test:build-contract": "node scripts/check-build-contract.js",
+    "test:build-output": "npm run test:offline-assets && npm run test:build-contract",
+    "test:offline-assets": "node scripts/check-offline-assets.js",
+    "test": "vitest run --config vitest.config.mjs",
+    "test:watch": "vitest --config vitest.config.mjs",
+    "coverage": "vitest run --config vitest.config.mjs --coverage"
+  }
+}

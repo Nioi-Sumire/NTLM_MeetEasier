@@ -1,0 +1,33 @@
+[Unit]
+Description=Room LED watcher (reads state file and sets GPIO)
+After=local-fs.target
+
+[Service]
+Type=simple
+User=@ROOM_LED_USER@
+Group=@ROOM_LED_GROUP@
+SupplementaryGroups=gpio
+Environment=GPIO_CHIP_LABEL=pinctrl-rp1
+Environment=GPIO_GREEN=@GPIO_GREEN@
+Environment=GPIO_RED=@GPIO_RED@
+Environment=LED_STATE_FILE=/run/room-led/state.json
+Environment=LED_POLL_INTERVAL_MS=2000
+Environment=GPIO_RETRY_INTERVAL_MS=2000
+ExecStart=/usr/bin/node /opt/room-led/led-daemon.js
+Restart=on-failure
+RestartSec=5s
+RuntimeDirectory=room-led
+RuntimeDirectoryMode=0750
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target
